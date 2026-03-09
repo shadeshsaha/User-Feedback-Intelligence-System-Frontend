@@ -29,7 +29,7 @@ export interface Feedback {
 
 export interface FeedbackInput {
   userName: string;
-  originalText: string;
+  content: string;
 }
 
 export interface Filters {

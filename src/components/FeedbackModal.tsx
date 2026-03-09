@@ -17,8 +17,13 @@ export default function FeedbackModal({
 }: Props) {
   const [form, setForm] = useState<FeedbackInput>({
     userName: "",
-    originalText: "",
+    content: "",
   });
+
+  const handleSubmitInternal = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(form);
+  };
 
   if (!isOpen) return null;
 
@@ -37,13 +42,7 @@ export default function FeedbackModal({
           </button>
         </div>
 
-        <form
-          className="p-6 space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            onSubmit(form);
-          }}
-        >
+        <form className="p-6 space-y-4" onSubmit={handleSubmitInternal}>
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase mb-1">
               User Name
@@ -64,10 +63,8 @@ export default function FeedbackModal({
               required
               className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 h-32 resize-none"
               placeholder="Describe the issue or suggestion..."
-              value={form.originalText}
-              onChange={(e) =>
-                setForm({ ...form, originalText: e.target.value })
-              }
+              value={form.content}
+              onChange={(e) => setForm({ ...form, content: e.target.value })}
             />
           </div>
           <button
