@@ -1,26 +1,29 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  AlertTriangle,
   Brain,
-  LayoutDashboard,
-  MessageSquareText,
+  Bug,
+  Frown,
+  MessageSquare,
   Plus,
-  Users,
-  X,
+  Search,
+  SlidersHorizontal,
+  Trash2,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import FeedbackModal from "./components/FeedbackModal";
-import FeedbackTable from "./components/FeedbackTable";
-import FilterBar from "./components/FilterBar";
-import StatsCard from "./components/StatsCard";
+import {
+  categoryColors,
+  priorityColors,
+  sentimentIcon,
+} from "./components/badgeColors";
 import * as api from "./services/api";
-import type { Feedback, FeedbackInput, Filters } from "./types";
+import type { Feedback, Filters } from "./types";
 
 export default function App() {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [filters, setFilters] = useState<Filters>({
     search: "",
     category: "All",
@@ -32,8 +35,6 @@ export default function App() {
     try {
       const data = await api.getAllFeedback();
       setFeedbacks(data);
-    } catch {
-      setError("Failed to load feedback from server");
     } finally {
       setIsFetching(false);
     }
@@ -43,131 +44,211 @@ export default function App() {
     fetchFeedbacks();
   }, [fetchFeedbacks]);
 
-  const handleSubmit = async (input: FeedbackInput) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const newFeedback = await api.submitFeedback(input);
-      setFeedbacks((prev) => [newFeedback, ...prev]);
-      setIsModalOpen(false);
-    } catch {
-      setError("AI analysis failed. Please check backend connection.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      await api.deleteFeedback(id);
-      setFeedbacks((prev) => prev.filter((fb) => fb._id !== id));
-    } catch {
-      setError("Failed to delete the entry.");
-    }
-  };
-
   const stats = useMemo(
     () => ({
       total: feedbacks.length,
       bugs: feedbacks.filter((f) => f.category === "Bug").length,
-      urgent: feedbacks.filter(
-        (f) => f.priority === "High" || f.priority === "Urgent",
-      ).length,
       negative: feedbacks.filter((f) => f.sentiment === "Negative").length,
     }),
     [feedbacks],
   );
 
-  const filtered = useMemo(() => {
-    return feedbacks.filter((fb) => {
-      const matchesSearch =
-        filters.search === "" ||
-        fb.originalText.toLowerCase().includes(filters.search.toLowerCase()) ||
-        fb.userName.toLowerCase().includes(filters.search.toLowerCase());
-      const matchesCategory =
-        filters.category === "All" || fb.category === filters.category;
-      const matchesPriority =
-        filters.priority === "All" || fb.priority === filters.priority;
-      return matchesSearch && matchesCategory && matchesPriority;
-    });
-  }, [feedbacks, filters]);
+  const filtered = useMemo(
+    () =>
+      feedbacks.filter((fb) => {
+        const matchesSearch =
+          fb.originalText
+            .toLowerCase()
+            .includes(filters.search.toLowerCase()) ||
+          fb.userName.toLowerCase().includes(filters.search.toLowerCase());
+        return (
+          matchesSearch &&
+          (filters.category === "All" || fb.category === filters.category)
+        );
+      }),
+    [feedbacks, filters],
+  );
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-indigo-600 text-white flex items-center justify-center">
-              <Brain size={20} />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-slate-900 leading-tight">
-                Feedback Intelligence
-              </h1>
-              <p className="text-xs text-slate-500 hidden sm:block">
-                AI-powered feedback triage
-              </p>
-            </div>
+    <div className="flex min-h-screen bg-[#fafafa] text-slate-900 font-sans">
+      {/* --- VERTICAL SIDEBAR STATS --- */}
+      <aside className="w-72 bg-white border-r border-slate-200 p-8 flex flex-col fixed h-full shadow-sm">
+        <div className="flex items-center gap-3 mb-12">
+          <div className="bg-indigo-600 p-2 rounded-xl text-white shadow-lg shadow-indigo-200">
+            <Brain size={24} />
           </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
-          >
-            <Plus size={16} />{" "}
-            <span className="hidden sm:inline">New Feedback</span>
-          </button>
+          <span className="font-black tracking-tight text-xl uppercase">
+            Nexus AI
+          </span>
         </div>
-      </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm">
-              <AlertTriangle size={16} /> {error}
+        <nav className="space-y-8 flex-1">
+          <VerticalStat
+            label="Total Feedback"
+            val={stats.total}
+            icon={<MessageSquare size={18} />}
+            color="bg-indigo-50 text-indigo-600"
+          />
+          <VerticalStat
+            label="Bug Reports"
+            val={stats.bugs}
+            icon={<Bug size={18} />}
+            color="bg-rose-50 text-rose-600"
+          />
+          <VerticalStat
+            label="Negative Sentiment"
+            val={stats.negative}
+            icon={<Frown size={18} />}
+            color="bg-amber-50 text-amber-600"
+          />
+        </nav>
+
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="mt-auto w-full py-4 bg-slate-900 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-600 transition-all shadow-xl"
+        >
+          <Plus size={18} /> New Entry
+        </button>
+      </aside>
+
+      {/* --- MAIN CONTENT --- */}
+      <main className="flex-1 ml-72 p-12">
+        <header className="flex justify-between items-center mb-10">
+          <div>
+            <h2 className="text-3xl font-black text-slate-800">
+              Intelligence Feed
+            </h2>
+            <p className="text-slate-400 font-medium">
+              Monitoring user behavior via LLM triage
+            </p>
+          </div>
+
+          <div className="flex gap-4">
+            <div className="relative">
+              <Search
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                size={16}
+              />
+              <input
+                className="pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 ring-indigo-50/5 w-64"
+                placeholder="Filter logs..."
+                onChange={(e) =>
+                  setFilters({ ...filters, search: e.target.value })
+                }
+              />
             </div>
-            <button onClick={() => setError(null)}>
-              <X size={16} />
+            <button className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-500 hover:text-indigo-600">
+              <SlidersHorizontal size={20} />
             </button>
           </div>
-        )}
+        </header>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatsCard
-            label="Total Feedback"
-            value={stats.total}
-            icon={<MessageSquareText size={20} />}
-            color="indigo"
-          />
-          <StatsCard
-            label="Bug Reports"
-            value={stats.bugs}
-            icon={<LayoutDashboard size={20} />}
-            color="rose"
-          />
+        <div className="space-y-4">
+          {isFetching ? (
+            <div className="text-center py-20 opacity-50 font-bold animate-pulse">
+              Syncing Database...
+            </div>
+          ) : (
+            filtered.map((fb) => (
+              <div
+                key={fb._id}
+                className="group flex items-center bg-white border border-slate-200 p-6 rounded-[2rem] hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-50/50 transition-all"
+              >
+                <div className="text-3xl mr-6 grayscale group-hover:grayscale-0 transition-all">
+                  {sentimentIcon[fb.sentiment]}
+                </div>
 
-          <StatsCard
-            label="Negative Sentiment"
-            value={stats.negative}
-            icon={<Users size={20} />}
-            color="slate"
-          />
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-1">
+                    <span className="font-bold text-slate-800">
+                      {fb.userName}
+                    </span>
+                    <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">
+                      {fb.assignedTeam}
+                    </span>
+                  </div>
+                  <p className="text-slate-500 text-sm italic line-clamp-1">
+                    "{fb.originalText}"
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <div
+                    className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase ${categoryColors[fb.category]}`}
+                  >
+                    {fb.category}
+                  </div>
+                  <div
+                    className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase ${priorityColors[fb.priority]}`}
+                  >
+                    {fb.priority}
+                  </div>
+                  <button
+                    onClick={async () => {
+                      await api.deleteFeedback(fb._id);
+                      setFeedbacks((prev) =>
+                        prev.filter((f) => f._id !== fb._id),
+                      );
+                    }}
+                    className="p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
-
-        <FilterBar filters={filters} onChange={setFilters} />
-
-        <FeedbackTable
-          feedbacks={filtered}
-          isLoading={isFetching}
-          onDelete={handleDelete}
-        />
       </main>
 
       <FeedbackModal
         isOpen={isModalOpen}
-        isLoading={isLoading}
+        isLoading={isSubmitting}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={handleSubmit}
+        onSubmit={async (data) => {
+          setIsSubmitting(true);
+          try {
+            const res = await api.submitFeedback(data);
+            setFeedbacks([res, ...feedbacks]);
+            setIsModalOpen(false);
+          } catch (error) {
+            console.error("Submission failed:", error);
+            alert("AI analysis failed. Please check backend connection.");
+          } finally {
+            // Stop loading regardless of success/fail
+            setIsSubmitting(false);
+          }
+        }}
       />
+    </div>
+  );
+}
+
+// --- VERTICAL STAT SUB-COMPONENT ---
+function VerticalStat({
+  label,
+  val,
+  icon,
+  color,
+}: {
+  label: string;
+  val: number;
+  icon: any;
+  color: string;
+}) {
+  return (
+    <div className="group cursor-default">
+      <div className="flex items-center justify-between mb-2">
+        <div
+          className={`p-2.5 rounded-xl ${color} transition-transform group-hover:scale-110`}
+        >
+          {icon}
+        </div>
+        <span className="text-2xl font-black text-slate-800">{val}</span>
+      </div>
+      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em]">
+        {label}
+      </p>
     </div>
   );
 }
