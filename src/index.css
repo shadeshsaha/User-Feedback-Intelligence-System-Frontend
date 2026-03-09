@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+/* Keep your custom glassmorphism and body styles below */
+body {
+  @apply bg-[#f8fafc] text-slate-900 antialiased;
+}
+
+.glass-card {
+  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-lg;
+}
