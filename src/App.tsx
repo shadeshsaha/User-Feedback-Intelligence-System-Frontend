@@ -138,7 +138,7 @@ export default function App() {
               <input
                 className="pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-4 ring-indigo-500/5 w-64 shadow-sm"
                 value={filters.search}
-                placeholder="Filter logs..."
+                placeholder="Search by name/feedback..."
                 onChange={(e) =>
                   setFilters({ ...filters, search: e.target.value })
                 }
