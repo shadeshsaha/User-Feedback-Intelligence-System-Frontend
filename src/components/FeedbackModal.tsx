@@ -23,6 +23,12 @@ export default function FeedbackModal({
   const handleSubmitInternal = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(form);
+    setForm({ userName: "", content: "" });
+  };
+
+  const handleClose = () => {
+    setForm({ userName: "", content: "" });
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -35,7 +41,8 @@ export default function FeedbackModal({
             Submit New Feedback
           </h2>
           <button
-            onClick={onClose}
+            onClick={handleClose}
+            type="button"
             className="text-slate-400 hover:text-slate-600 transition-colors"
           >
             <X size={20} />
