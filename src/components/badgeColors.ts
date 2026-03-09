@@ -2,7 +2,7 @@ import type { AssignedTeam, Category, Priority, Sentiment } from "../types";
 
 export const categoryColors: Record<Category, string> = {
   Bug: "bg-red-50 text-red-600",
-  "Feature Request": "bg-violet-50 text-violet-600",
+  Features: "bg-violet-50 text-violet-600",
   "UI/UX": "bg-cyan-50 text-cyan-600",
   Performance: "bg-orange-50 text-orange-600",
   General: "bg-slate-50 text-slate-600",

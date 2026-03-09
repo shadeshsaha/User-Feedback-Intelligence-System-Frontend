@@ -10,6 +10,7 @@ interface Props {
 export default function FilterBar({ filters, onChange }: Props) {
   return (
     <div className="flex flex-col md:flex-row gap-4 items-center">
+      {/* ... Search Input code ... */}
       <div className="relative flex-1 w-full">
         <Search
           className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
@@ -25,8 +26,9 @@ export default function FilterBar({ filters, onChange }: Props) {
       </div>
 
       <div className="flex gap-2 w-full md:w-auto">
+        {/* CATEGORY DROPDOWN */}
         <select
-          className="bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 ring-indigo-500/10"
+          className="bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 ring-indigo-500/10 cursor-pointer"
           value={filters.category}
           onChange={(e) =>
             onChange({ ...filters, category: e.target.value as any })
@@ -34,10 +36,13 @@ export default function FilterBar({ filters, onChange }: Props) {
         >
           <option value="All">All Categories</option>
           <option value="Bug">Bug</option>
-          <option value="Feature Request">Feature Request</option>
+          <option value="Features">Features</option>
           <option value="UI/UX">UI/UX</option>
+          <option value="Performance">Performance</option>
+          <option value="General">General</option>
         </select>
 
+        {/* PRIORITY DROPDOWN */}
         <select
           className="bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 ring-indigo-500/10"
           value={filters.priority}
