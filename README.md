@@ -1,73 +1,117 @@
-# React + TypeScript + Vite
+# Nexus AI | Feedback Intelligence Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Nexus AI is a sophisticated feedback management system that leverages **LLM-based triage** to automatically categorize, prioritize, and analyze the sentiment of user feedback. This dashboard provides real-time monitoring of user behavior through an intuitive, retro-modern interface.
 
-Currently, two official plugins are available:
+## 🚀 Project Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The Nexus AI Frontend serves as the command center for product teams. Instead of manually sorting through raw logs, the system uses an AI backend to "triage" incoming text into actionable data points:
 
-## React Compiler
+- **Sentiment Analysis:** Identifies Positive, Neutral, or Negative tones.
+- **Auto-Categorization:** Sorts logs into Bugs, Features, UI/UX, etc.
+- **Smart Routing:** Assigns tasks to specific teams (Frontend, Backend, DevOps).
+- **Priority Leveling:** Escalates urgent issues automatically.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## ✨ Key Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Intelligence Feed:** A real-time, filtered list of all AI-analyzed feedback.
+- **Multi-Dimensional Filtering:** Instantly sort by search terms, categories, and priority levels using synchronized state management.
+- **Live Statistics:** Sidebar overview of total logs, bug counts, and negative sentiment trends.
+- **AI Submission Modal:** A dedicated interface for submitting new feedback for instant LLM analysis.
+- **Responsive Design:** Optimized for various screen sizes with a clean, "Nexus" aesthetic using Tailwind CSS.
+- **Type Safety:** Built with TypeScript to ensure robust data handling across the MERN stack.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🛠 Tech Stack
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Core
+
+- **React 19:** Utilizing `useMemo` for high-performance filtering and `useCallback` for optimized API fetching.
+- **TypeScript:** Full type safety for feedback structures and UI components.
+- **Vite:** Ultra-fast frontend tooling and bundling.
+
+### Styling & Icons
+
+- **Tailwind CSS 4.0:** Advanced styling using the latest PostCSS features.
+- **Lucide React:** Beautiful, consistent iconography.
+
+### Networking
+
+- **Axios:** Promise-based HTTP client for backend communication.
+
+---
+
+## 📂 Project Structure
+
+```text
+src/
+├── components/          # Reusable UI components (Badges, Stats, Modals)
+│   ├── badgeColors.ts   # Configuration for dynamic UI coloring
+│   ├── FeedbackModal.tsx
+│   ├── FeedbackTable.tsx
+│   ├── FilterBar.tsx
+│   ├── Badge.tsx
+│   └── StatsCard.tsx    # Sidebar stat components
+├── services/            # API communication logic
+│   └── api.ts           # Axios instance and endpoint definitions
+├── types.ts             # Global TypeScript interfaces and types
+├── App.tsx              # Main dashboard layout and state logic
+└── main.tsx             # Entry point
+
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## ⚙️ Installation & Setup
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Prerequisites
+
+- **Node.js:** v18.0.0 or higher
+- **Package Manager:** npm or yarn
+- **Backend:** Ensure the [Nexus AI Backend] is running.
+
+### Frontend Setup
+
+1. **Clone the repository:**
+
+```bash
+git clone https://github.com/shadeshsaha/User-Feedback-Intelligence-System-Frontend.git
+cd User-Feedback-Intelligence-System-Frontend
+
 ```
+
+2. **Install dependencies:**
+
+```bash
+npm install
+
+```
+
+3. **Configure API Endpoint:**
+   Ensure `src/services/api.ts` points to your running backend:
+
+```typescript
+baseURL: "http://localhost:5000/api";
+```
+
+4. **Start the development server:**
+
+```bash
+npm run dev
+
+```
+
+5. **Build for production:**
+
+```bash
+npm run build
+
+```
+
+---
+
+## 🛡️ License
+
+Distributed under the MIT License. See `LICENSE` for more information.
