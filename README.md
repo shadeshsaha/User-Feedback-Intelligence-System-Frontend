@@ -2,6 +2,8 @@
 
 Nexus AI is a sophisticated feedback management system that leverages **LLM-based triage** to automatically categorize, prioritize, and analyze the sentiment of user feedback. This dashboard provides real-time monitoring of user behavior through an intuitive, retro-modern interface.
 
+🚀 Live Demo: https://nexus-ai-frontend-rho.vercel.app/
+
 ## 🚀 Project Overview
 
 The Nexus AI Frontend serves as the command center for product teams. Instead of manually sorting through raw logs, the system uses an AI backend to "triage" incoming text into actionable data points:
